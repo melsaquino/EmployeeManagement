@@ -7,8 +7,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Date;
-
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name="employees")
 public class Employee extends Person{
     @Id
@@ -27,10 +27,6 @@ public class Employee extends Person{
     @Setter(AccessLevel.PUBLIC)
     protected double salary;
 
-    @Column(nullable = false)
-    @Getter(AccessLevel.PUBLIC)
-    @Setter(AccessLevel.PUBLIC)
-    private String password;
     public Employee(String name, LocalDate dateOfBirth){
         super(name,dateOfBirth);
     }

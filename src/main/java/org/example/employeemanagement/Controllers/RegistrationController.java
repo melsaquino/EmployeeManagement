@@ -1,6 +1,7 @@
 package org.example.employeemanagement.Controllers;
 
 import jakarta.servlet.http.HttpSession;
+import org.example.employeemanagement.Repositories.AdminsRepository;
 import org.example.employeemanagement.Repositories.EmployeesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,6 +19,9 @@ import java.util.Date;
 public class RegistrationController {
     @Autowired
     private EmployeesRepository employeesRepository;
+    @Autowired
+    private AdminsRepository adminsRepository;
+
     /**
      * Shows the registration
      * */
@@ -39,7 +43,7 @@ public class RegistrationController {
                              @RequestParam("psw_repeat") String psw_repeat, RedirectAttributes redirectAttributes, Model model){
         RegistrationService registrationService;
 
-        registrationService = new RegistrationService(employeesRepository);
+        registrationService = new RegistrationService(adminsRepository);
         try{
             registrationService.registerUser(id, name, dateBirth, department,salary,password,psw_repeat );
             redirectAttributes.addFlashAttribute("successMessage", "User Created Successful");

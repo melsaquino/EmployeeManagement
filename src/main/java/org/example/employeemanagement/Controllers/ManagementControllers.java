@@ -1,9 +1,12 @@
 package org.example.employeemanagement.Controllers;
 
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import org.example.employeemanagement.DTOs.EmployeeDTO;
 import org.example.employeemanagement.Entities.Employee;
 import org.example.employeemanagement.Repositories.EmployeesRepository;
+import org.example.employeemanagement.Services.GenerateAverageAge;
+import org.example.employeemanagement.Services.GenerateAverageSalary;
 import org.example.employeemanagement.Services.ManagementService;
 import org.example.employeemanagement.Services.RegistrationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,8 @@ public class ManagementControllers {
 
     @Autowired
     EmployeesRepository employeesRepository;
+    @Autowired
+    private ManagementService managementService;
 
     @GetMapping("/employees")
     public String showHome(){
@@ -40,13 +45,13 @@ public class ManagementControllers {
     }
     @PostMapping("/api/add_employee")
     public String addEmployee(@RequestParam("id") int id, @RequestParam("name") String name, @RequestParam("dateOfBirth") LocalDate dateBirth,
-                                               @RequestParam("department") String department, @RequestParam("salary") double salary, @RequestParam("password") String password,
-                                               @RequestParam("psw_repeat") String psw_repeat, RedirectAttributes redirectAttributes, Model model){
-        RegistrationService registrationService;
+                                               @RequestParam("department") String department, @RequestParam("salary") double salary,
+                                                RedirectAttributes redirectAttributes, Model model){
+        ManagementService managementService;
 
-        registrationService = new RegistrationService(employeesRepository);
+        managementService = new ManagementService(employeesRepository);
         try{
-            registrationService.registerUser(id, name, dateBirth, department,salary,password,psw_repeat );
+            managementService.registerUser(id, name, dateBirth, department,salary);
             redirectAttributes.addFlashAttribute("successMessage", "User Created Successful");
 
             return "redirect:/employees";
@@ -75,13 +80,67 @@ public class ManagementControllers {
     }
     @Transactional
     @DeleteMapping("/api/employees/{employeeId}")
-    public String deleteEmployee(@PathVariable("employeeId") int employeeId,RedirectAttributes redirectAttributes){
+    public String deleteEmployee(@PathVariable("employeeId") int employeeId, HttpSession session,RedirectAttributes redirectAttributes){
         System.out.println("this was triggered");
         ManagementService managementService = new ManagementService(employeesRepository);
-        managementService.deleteEmployee(employeeId);
-        redirectAttributes.addFlashAttribute("successMessage", "User Deleted Successful");
 
+        EmployeeDTO user = managementService.findByEmployees((String)session.getAttribute("userId"));
+        if (user!=null){
+            managementService.deleteEmployee(employeeId);
+            redirectAttributes.addFlashAttribute("successMessage", "User Deleted Successful");
+        }
+        else{
+            redirectAttributes.addFlashAttribute("errorMessage", "User already does not exist");
+
+        }
         return "redirect:/employees";
+    }
+
+    @GetMapping("/api/employees/search")
+    public ResponseEntity<List<EmployeeDTO>> searchByQuery(@RequestParam("query")String query,HttpSession session) {
+
+        try {
+            ManagementService managementService = new ManagementService(employeesRepository);
+            return ResponseEntity.ok(managementService.findBySearchQuery(query));
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/api/employees/generate/salary")
+    public ResponseEntity<Double>generateAveSalary() {
+
+        try {
+            GenerateAverageSalary generateAverageSalary= new GenerateAverageSalary(employeesRepository);
+            return ResponseEntity.ok(generateAverageSalary.generate());
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/api/employees/generate/age")
+    public ResponseEntity<Double>generateAveAge() {
+
+        try {
+            GenerateAverageAge generateAverageAge= new GenerateAverageAge(employeesRepository);
+            return ResponseEntity.ok(generateAverageAge.generate());
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/api/employees/sorted")
+    public ResponseEntity<List<EmployeeDTO>> displaySortedEmployees(@RequestParam(name="sortBy")String sortBy,@RequestParam(name = "sortOrder",defaultValue = "ASC") String sortOrder) {
+        try {
+            ManagementService managementService = new ManagementService(employeesRepository);
+            return ResponseEntity.ok(managementService.getAllSortedEmployees(sortBy,sortOrder));
+
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 

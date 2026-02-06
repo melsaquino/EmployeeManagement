@@ -38,7 +38,6 @@ function fetchBasedOnEndPoints(url, method) {
                       Edit
                     </button></td>
                     <td><button class="btn btn-outline-danger" onClick="deleteItem(${employee.employeeId})">Delete</button></td>
-
                     `;
 
                 const td = document.createElement('td');
@@ -49,23 +48,53 @@ function fetchBasedOnEndPoints(url, method) {
             });
         })
         .catch(error => {
-            console.error('Error loading books:', error);
+            console.error('Error loading employees:', error);
         });
 }
+
+async function fetchAverageSalary() {
+    try {
+        const response = await fetch(`/api/employees/generate/salary`,{
+            method: 'GET'});
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(data);
+        document.getElementById('average-salary').innerHTML = `<br> Average Salary:</br>${data}`;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        document.getElementById('dataOutput').textContent = 'Failed to load data.';
+    }
+}
+async function fetchAverageAge() {
+    try {
+        const response = await fetch(`/api/employees/generate/age`,{
+            method: 'GET'});
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(data);
+        document.getElementById('average-age').innerHTML = `<br> Average Age:</br>${data}`;
+    } catch (error) {
+        console.error('Fetch error:', error);
+        document.getElementById('dataOutput').textContent = 'Failed to load data.';
+    }
+}
 function deleteItem(employeeId) {
-    if (confirm("Are you sure you want to delete this item?")) {
+    if (confirm("Are you sure you want to delete this employee")) {
         fetch(`/api/employees/${employeeId}`, {
             method: 'DELETE',
         })
             .then(response => {
                 if (response.ok) {
-                    // Handle successful deletion (e.g., remove the item from the UI, show a message)
                     console.log(`User ${employeeId} deleted successfully.`);
-                    // Optionally, redirect or refresh the page
-                    // window.location.reload();
+                    //Optionally, redirect or refresh the page
+                    //window.location.reload();
                 } else {
                     // Handle errors (e.g., item not found, server error)
-                    console.error('Failed to delete the item.');
+                    console.error('Failed to delete the employee.');
                 }
             })
             .catch(error => {
@@ -88,6 +117,37 @@ function fetchAll(page = 0) {
     currentPage = page;
     fetchBasedOnEndPoints(`/api/employees`, "GET");
 }
+let orderAge = "ASC";
+let orderDepartment ="ASC"
+function displayByAge(){
+    fetchBasedOnEndPoints(`api/employees/sorted?sortBy=age&sortOrder=${orderAge}`)
+    if (orderAge==="ASC"){
+        orderAge = "DESC";
+    }else{
+        orderAge = "ASC";
+    }
+}
+function displayByDepartment(){
+    fetchBasedOnEndPoints(`api/employees/sorted?sortBy=department&sortOrder=${orderDepartment}`)
+    if (orderDepartment==="ASC"){
+        orderDepartment = "DESC";
+    }else{
+        orderDepartment = "ASC";
+    }
+}
+document.getElementById("search-bar").addEventListener("submit", function(event) {
+    event.preventDefault(); // prevent page reload
+    const query = document.getElementById("query").value;
+
+    // Construct URL with query parameters
+    const params = new URLSearchParams();
+    if (query) params.append("query", query);
+
+    const url = `/api/employees/search?${params.toString()}`;
+    fetchBasedOnEndPoints(url, "GET");
+
+});
+
 /*
 document.getElementById("nextBtn").addEventListener("click", () => {
     fetchAll(currentPage + 1);

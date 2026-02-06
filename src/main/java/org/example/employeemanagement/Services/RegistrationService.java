@@ -1,7 +1,9 @@
 package org.example.employeemanagement.Services;
 
 
+import org.example.employeemanagement.Entities.Admin;
 import org.example.employeemanagement.Entities.Employee;
+import org.example.employeemanagement.Repositories.AdminsRepository;
 import org.example.employeemanagement.Repositories.EmployeesRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,9 +17,9 @@ import java.time.LocalDate;
 public class RegistrationService {
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
-    private final EmployeesRepository employeesRepository;
-    public RegistrationService(EmployeesRepository employeesRepository){
-        this.employeesRepository=employeesRepository;
+    private final AdminsRepository adminsRepository;
+    public RegistrationService(AdminsRepository adminsRepository){
+        this.adminsRepository=adminsRepository;
     }
     /**
      * Method used to add the user to the users table of the database
@@ -29,9 +31,9 @@ public class RegistrationService {
                              String password, String psw_repeat) throws Exception{
         if (!isPasswordsMatch(password,psw_repeat))
             throw new Exception("Passwords don't match. Re-enter passwords");
-        if(employeesRepository.findByEmployeeId(id)==null){
+        if(adminsRepository.findByEmployeeId(id)==null){
             String hashedPassword = encoder.encode(password);
-            Employee employee=new Employee();
+            Admin employee=new Admin();
             employee.setName(name);
             employee.setDateOfBirth(dateOfBirth);
             employee.setDepartment(department);
@@ -39,7 +41,7 @@ public class RegistrationService {
             employee.setPassword(hashedPassword);
             employee.setEmployeeId(id);
 
-            this.employeesRepository.save(employee);
+            this.adminsRepository.save(employee);
         }
         else throw new Exception("User already exists!");
     }
