@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    <title>Registration</title>
+</head>
+<body>
+<div th:if="${errorMessage}" class="alert alert-danger">
+    <p th:text="${errorMessage}">Display the error message here.</p>
+</div>
+<form method="POST" th:action="@{/registration}" >
+
+    <div class="form-group">
+        <label for="id" ><b>ID</b></label>
+        <input type="text" class="form-control"  placeholder="Enter ID"  name="id" id="id" required>
+    </div>
+    <div class="form-group">
+        <label for="name" ><b>Name</b></label>
+        <input type="text" class="form-control"  placeholder="Enter Name"  name="name" id="name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="dateOfBirth" ><b>Birthday</b></label>
+        <input type="date" class="form-control"   name="dateOfBirth" id="dateOfBirth" required>
+    </div>
+
+    <div class="form-group">
+        <label for="department" ><b>Department</b></label>
+        <input type="text" class="form-control"  placeholder="Enter Department"  name="department" id="department" required>
+    </div>
+
+    <div class="form-group">
+        <label for="salary" ><b>Salary</b></label>
+        <input type="text" class="form-control"  placeholder="Enter Salary"  name="salary" id="salary" required>
+    </div>
+
+    <div class="form-group">
+        <label for="password"><b>Password</b></label>
+        <input type="password" class="form-control"  placeholder="Enter Password"  name="password" id="password" required>
+    </div>
+    <div class="form-group">
+        <label for="psw_repeat"><b>Repeat Password</b></label>
+        <input type="password" class="form-control"  placeholder="Repeat Password"  name="psw_repeat" id="psw_repeat" required><button type="submit" class="registerbtn">Register</button>
+    </div>
+
+    <div class="container signin">
+        <p>Already have an account? <a href="/login">Login</a>.</p>
+    </div>
+</form>
+</body>
+</html>

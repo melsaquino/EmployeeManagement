@@ -1,0 +1,37 @@
+
+<form th:fragment="createEmployee" method="POST" th:action="@{/api/add_employee}" >
+    <div class="form-group">
+        <label for="id" ><b>ID</b></label>
+        <input type="text" class="form-control"  placeholder="Enter ID"  name="id" id="id" required>
+    </div>
+    <div class="form-group">
+        <label for="name" ><b>Name</b></label>
+        <input type="text" class="form-control"  placeholder="Enter Name"  name="name" id="name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="dateOfBirth" ><b>Birthday</b></label>
+        <input type="date" class="form-control"   name="dateOfBirth" id="dateOfBirth" required>
+    </div>
+
+    <div class="form-group">
+        <label for="department" ><b>Department</b></label>
+        <input type="text" class="form-control"  placeholder="Enter Department"  name="department" id="department" required>
+    </div>
+
+    <div class="form-group">
+        <label for="salary" ><b>Salary</b></label>
+        <input type="text" class="form-control"  placeholder="Enter Salary"  name="salary" id="salary" required>
+    </div>
+
+    <div class="form-group">
+        <label for="password"><b>Password</b></label>
+        <input type="password" class="form-control"  placeholder="Enter Password"  name="password" id="password" required>
+    </div>
+    <div class="form-group">
+        <label for="psw_repeat"><b>Repeat Password</b></label>
+        <input type="password" class="form-control"  placeholder="Repeat Password"  name="psw_repeat" id="psw_repeat" required>
+    </div>
+
+
+

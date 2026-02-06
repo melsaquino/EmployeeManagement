@@ -1,0 +1,34 @@
+
+<form th:fragment="editEmployee" method="POST" th:action="@{/api/edit_employee}" >
+    <div class="form-group">
+        <label for="edit-id" ><b>ID</b></label>
+        <!--span id="modalEmployeeId"></span-->
+        <input type="text" class="form-control" name="edit-id" id="edit-id" readonly>
+    </div>
+    <div class="form-group">
+        <label for="edit-name" ><b>Name</b></label>
+        <input type="text" class="form-control"  placeholder="Enter Name"  name="edit-name" id="edit-name" required>
+    </div>
+
+    <div class="form-group">
+        <label for="edit-dateOfBirth"><b>Birthday</b></label>
+        <input type="date" class="form-control"   name="edit-dateOfBirth" id="edit-dateOfBirth" required>
+    </div>
+
+    <div class="form-group">
+        <label for="edit-department"><b>Department</b></label>
+        <input type="text" class="form-control"  placeholder="Enter Department"  name="edit-department" id="edit-department" required>
+    </div>
+
+    <div class="form-group">
+        <label for="edit-salary" ><b>Salary</b></label>
+        <input type="text" class="form-control"  placeholder="Enter Salary"  name="edit-salary" id="edit-salary" required>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    </div>
+</form>
+
+
+
+

@@ -1,0 +1,89 @@
+package org.example.employeemanagement.Controllers;
+
+import jakarta.transaction.Transactional;
+import org.example.employeemanagement.DTOs.EmployeeDTO;
+import org.example.employeemanagement.Entities.Employee;
+import org.example.employeemanagement.Repositories.EmployeesRepository;
+import org.example.employeemanagement.Services.ManagementService;
+import org.example.employeemanagement.Services.RegistrationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Controller
+public class ManagementControllers {
+
+    @Autowired
+    EmployeesRepository employeesRepository;
+
+    @GetMapping("/employees")
+    public String showHome(){
+        return"employees";
+    }
+    @GetMapping("/api/employees")
+    public ResponseEntity<List<EmployeeDTO>> displayEmployees() {
+
+        try {
+            ManagementService managementService = new ManagementService(employeesRepository);
+            return ResponseEntity.ok(managementService.getAllEmployees());
+
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @PostMapping("/api/add_employee")
+    public String addEmployee(@RequestParam("id") int id, @RequestParam("name") String name, @RequestParam("dateOfBirth") LocalDate dateBirth,
+                                               @RequestParam("department") String department, @RequestParam("salary") double salary, @RequestParam("password") String password,
+                                               @RequestParam("psw_repeat") String psw_repeat, RedirectAttributes redirectAttributes, Model model){
+        RegistrationService registrationService;
+
+        registrationService = new RegistrationService(employeesRepository);
+        try{
+            registrationService.registerUser(id, name, dateBirth, department,salary,password,psw_repeat );
+            redirectAttributes.addFlashAttribute("successMessage", "User Created Successful");
+
+            return "redirect:/employees";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMessage",e.getMessage());
+            return "redirect:/employees";
+        }
+
+    }
+    @PostMapping("/api/edit_employee")
+    public String editEmployee(@RequestParam("edit-id") int id, @RequestParam("edit-name") String name, @RequestParam("edit-dateOfBirth") LocalDate dateBirth,
+                              @RequestParam("edit-department") String department, @RequestParam("edit-salary") double salary, RedirectAttributes redirectAttributes, Model model){
+        ManagementService managementService = new ManagementService(employeesRepository);
+
+        try{
+            managementService.updateEmployees(id, name, dateBirth, department,salary);
+            redirectAttributes.addFlashAttribute("successMessage", "User Created Successful");
+            return "redirect:/employees";
+
+        } catch (Exception e) {
+            model.addAttribute("errorMessage",e.getMessage());
+            return "redirect:/employees";
+        }
+
+    }
+    @Transactional
+    @DeleteMapping("/api/employees/{employeeId}")
+    public String deleteEmployee(@PathVariable("employeeId") int employeeId,RedirectAttributes redirectAttributes){
+        System.out.println("this was triggered");
+        ManagementService managementService = new ManagementService(employeesRepository);
+        managementService.deleteEmployee(employeeId);
+        redirectAttributes.addFlashAttribute("successMessage", "User Deleted Successful");
+
+        return "redirect:/employees";
+    }
+
+
+
+}
