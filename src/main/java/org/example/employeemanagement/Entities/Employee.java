@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
+/**
+ * Entity meant to represent all the Employees
+ * */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @Table(name="employees")
@@ -34,5 +36,6 @@ public class Employee extends Person{
     public Employee(){
         super();
     };
+
 
 }

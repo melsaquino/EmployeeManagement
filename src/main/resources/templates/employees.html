@@ -5,13 +5,21 @@
     <meta name="_csrf" content="${_csrf.token}">
     <meta name="_csrf_header" content="${_csrf.headerName}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-    <script src ="/fetchEmployees.js" defer></script>
+    <script src ="/js/fetchEmployees.js" defer></script>
+    <link rel="stylesheet" href ="/styles.css">
     <title>Employees Management</title>
 </head>
 <body>
     <div class="container">
+        <div th:if="${successMessage}" class="alert alert-success">
+            <p th:text="${successMessage}"></p>
+        </div>
+        <div th:if="${errorMessage}" class="alert alert-danger">
+            <p th:text="${errorMessage}">Display the error message here.</p>
+        </div>
         <h1>Employees</h1>
         <div class="container">
             <div style="padding:10px">
@@ -22,31 +30,54 @@
                         Search
                     </button>
                 </form>
+                <form method="get" id="employees-filter" class="row g-2 mb-3">
+                    <input type="hidden" name="q" th:value="${param.q}">
+
+                    <div class="col-md-3">
+                        <input type="text" class="form-control" name="department" id="department" placeholder="Filter Department?"/>
+                    </div>
+
+                    <div class="col-md-3">
+                        <button class="btn btn-primary w-100">Apply</button>
+                    </div>
+                </form>
             </div>
 
-            <div>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+            <div class="row align-items-center mb-2">
+                <button type="button" class="btn btn-success mb-1" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
                     Add Employee
                 </button>
-                <button class="btn btn-warning" onClick="fetchAverageAge()" > Generate Average Age</button>
-                <button class ="btn btn-info" onClick="fetchAverageSalary()">Generate Average Salary</button>
-            </div>
-            <button class ="btn btn-light" onClick="displayByAge()">Display by Age</button>
-            <button class ="btn btn-light" onClick="displayByDepartment()">Display by department</button>
+                <div class="col-auto">
+                    <button class="btn btn-warning me-2 " onClick="fetchAverageAge()">
+                        Generate Average Age
+                    </button>
+                </div>
+                <div class="col">
+                    <p id="average-age" class="mb-0 flex-grow-1"></p>
+                </div>
 
+                <div class="col-auto">
+                    <button class="btn btn-info me-2 " onClick="fetchAverageSalary()">
+                        Generate Average Salary
+                    </button>
+                </div>
+                <div class="col">
+                    <p id="average-salary" class="mb-0 flex-grow-1"></p>
+                </div>
+            </div>
             <table class="table table-striped">
             <tr>
                 <th>Id</th>
                 <th>Name</th>
-                <th onClick="displayByAge()" >Date of Birth</th>
-                <th onClick="displayByDepartment()">Department</th>
+                <th class="clickable" onClick="displayByAge()" >Date of Birth</th>
+                <th class="clickable" onClick="displayByDepartment()">Department</th>
                 <th>Salary</th>
-                <th colspan="2">Actions</th>
+                <th colspan="2" >Actions</th>
 
             </tr>
             <tbody id="employees-list"></tbody>
         </table>
-            <p id="average-salary"></p> <p id="average-age"></p>
+
     <div class="modal fade" id="addEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="Add Employee" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -77,27 +108,10 @@
         </div>
     </div>
 
-
-    <div class="modal fade" id="deleteEmployeeModal" tabindex="-1" role="dialog" aria-labelledby="Edit Employee" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteUserModalLabel">Add Employee</h5>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete this user?
-                </div>
-
-            </div>
-            <div class="modal-footer">
-                <button type="submit" class="btn btn-primary editbtn">Yes</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            </div>
+        <form th:action="@{/logout}" method="POST">
+            <button class="btn btn-outline-dark"  type="submit">Logout</button>
+        </form>
         </div>
-    </div>
-    <form th:action="@{/logout}" method="POST">
-        <button class="btn btn-outline-dark"  type="submit">Logout</button>
-    </form>
     </div>
 </body>
 </html>

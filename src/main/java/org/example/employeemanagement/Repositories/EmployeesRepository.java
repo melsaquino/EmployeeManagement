@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
-
+/** JPA repository that interacts with the employees table in the database
+ * */
 public interface EmployeesRepository extends JpaRepository<Employee, Integer> {
     Employee findByEmployeeId(int id);
     List<Employee> findByDateOfBirth(LocalDate date);
@@ -18,4 +19,6 @@ public interface EmployeesRepository extends JpaRepository<Employee, Integer> {
     @Query("SELECT e FROM Employee e WHERE " +
             ":id IS NOT NULL and (e.employeeId) =  :id")
     List<Employee>searchByNameOrEmployeeId(int id);
+
+    List<Employee> findByDepartment(String department);
 }

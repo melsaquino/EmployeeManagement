@@ -8,7 +8,9 @@ import jakarta.persistence.MappedSuperclass;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-
+/**
+ * Abstract class meant to represent a person
+ * */
 @MappedSuperclass
 public abstract class Person {
     @Column(nullable = false)
@@ -26,7 +28,9 @@ public abstract class Person {
         this.dateOfBirth =dateOfBirth;
     }
     public Person(){};
-
+    /**
+     * Method used to calculate a person's age
+     * */
     public int getAge(){
         return Period.between( dateOfBirth,LocalDate.now()).getYears();
     }

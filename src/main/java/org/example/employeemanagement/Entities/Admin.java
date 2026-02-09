@@ -7,7 +7,9 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
-
+/**
+ * Entity meant to represent the admin
+ * */
 @Entity
 @Table(name="admins")
 public class Admin extends Employee{

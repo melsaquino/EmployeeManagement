@@ -5,10 +5,7 @@ import jakarta.transaction.Transactional;
 import org.example.employeemanagement.DTOs.EmployeeDTO;
 import org.example.employeemanagement.Entities.Employee;
 import org.example.employeemanagement.Repositories.EmployeesRepository;
-import org.example.employeemanagement.Services.GenerateAverageAge;
-import org.example.employeemanagement.Services.GenerateAverageSalary;
-import org.example.employeemanagement.Services.ManagementService;
-import org.example.employeemanagement.Services.RegistrationService;
+import org.example.employeemanagement.Services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +25,10 @@ public class ManagementControllers {
     @Autowired
     private ManagementService managementService;
 
+    @GetMapping("/")
+    public String showDefault(){
+        return"redirect:/employees";
+    }
     @GetMapping("/employees")
     public String showHome(){
         return"employees";
@@ -47,17 +48,17 @@ public class ManagementControllers {
     public String addEmployee(@RequestParam("id") int id, @RequestParam("name") String name, @RequestParam("dateOfBirth") LocalDate dateBirth,
                                                @RequestParam("department") String department, @RequestParam("salary") double salary,
                                                 RedirectAttributes redirectAttributes, Model model){
-        ManagementService managementService;
+        ModifyDBServices modifyDBServices;
 
-        managementService = new ManagementService(employeesRepository);
+        modifyDBServices= new ModifyDBServices(employeesRepository);
         try{
-            managementService.registerUser(id, name, dateBirth, department,salary);
+            modifyDBServices.registerUser(id, name, dateBirth, department,salary);
             redirectAttributes.addFlashAttribute("successMessage", "User Created Successful");
 
             return "redirect:/employees";
 
         } catch (Exception e) {
-            model.addAttribute("errorMessage",e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/employees";
         }
 
@@ -65,15 +66,16 @@ public class ManagementControllers {
     @PostMapping("/api/edit_employee")
     public String editEmployee(@RequestParam("edit-id") int id, @RequestParam("edit-name") String name, @RequestParam("edit-dateOfBirth") LocalDate dateBirth,
                               @RequestParam("edit-department") String department, @RequestParam("edit-salary") double salary, RedirectAttributes redirectAttributes, Model model){
-        ManagementService managementService = new ManagementService(employeesRepository);
+        ModifyDBServices modifyDBServices;
 
+        modifyDBServices= new ModifyDBServices(employeesRepository);
         try{
-            managementService.updateEmployees(id, name, dateBirth, department,salary);
-            redirectAttributes.addFlashAttribute("successMessage", "User Created Successful");
+            modifyDBServices.updateEmployees(id, name, dateBirth, department,salary);
+            redirectAttributes.addFlashAttribute("successMessage", "User Edited Successful");
             return "redirect:/employees";
 
         } catch (Exception e) {
-            model.addAttribute("errorMessage",e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
             return "redirect:/employees";
         }
 
@@ -83,14 +85,16 @@ public class ManagementControllers {
     public String deleteEmployee(@PathVariable("employeeId") int employeeId, HttpSession session,RedirectAttributes redirectAttributes){
         System.out.println("this was triggered");
         ManagementService managementService = new ManagementService(employeesRepository);
+        ModifyDBServices modifyDBServices;
 
+        modifyDBServices= new ModifyDBServices(employeesRepository);
         EmployeeDTO user = managementService.findByEmployees((String)session.getAttribute("userId"));
         if (user!=null){
-            managementService.deleteEmployee(employeeId);
+            modifyDBServices.deleteEmployee(employeeId);
             redirectAttributes.addFlashAttribute("successMessage", "User Deleted Successful");
         }
         else{
-            redirectAttributes.addFlashAttribute("errorMessage", "User already does not exist");
+            redirectAttributes.addFlashAttribute("errorMessage", "User does not exist");
 
         }
         return "redirect:/employees";
@@ -108,7 +112,7 @@ public class ManagementControllers {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/api/employees/generate/salary")
+    @GetMapping("/api/employees/average_salary")
     public ResponseEntity<Double>generateAveSalary() {
 
         try {
@@ -120,7 +124,20 @@ public class ManagementControllers {
             return ResponseEntity.notFound().build();
         }
     }
-    @GetMapping("/api/employees/generate/age")
+    @GetMapping("/api/employees/average_salary/dept={department}")
+    public ResponseEntity<Double>generateAveSalary(@PathVariable("department") String department) {
+
+        try {
+            GenerateAverageSalary generateAverageSalary= new GenerateAverageSalary(employeesRepository);
+            return ResponseEntity.ok(generateAverageSalary.generate(department));
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/api/employees/average_age")
     public ResponseEntity<Double>generateAveAge() {
 
         try {
@@ -129,6 +146,29 @@ public class ManagementControllers {
 
         } catch (Exception e) {
             System.out.println(e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/api/employees/average_age/dept={department}")
+    public ResponseEntity<Double>generateAveAge(@PathVariable("department") String department) {
+
+        try {
+            GenerateAverageAge generateAverageAge= new GenerateAverageAge(employeesRepository);
+            return ResponseEntity.ok(generateAverageAge.generate(department));
+
+        } catch (Exception e) {
+            System.out.println(e);
+            return ResponseEntity.notFound().build();
+        }
+    }
+    @GetMapping("/api/employees/filtered")
+    public ResponseEntity<List<EmployeeDTO>> filterEmployees(@RequestParam(name="department",required = false)String department) {
+        try {
+            ManagementService managementService = new ManagementService(employeesRepository);
+            return ResponseEntity.ok(managementService.getFilteredEmployees(department));
+
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -142,7 +182,6 @@ public class ManagementControllers {
             return ResponseEntity.notFound().build();
         }
     }
-
 
 
 }

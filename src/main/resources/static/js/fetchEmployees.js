@@ -1,9 +1,9 @@
 const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+let filteredDepartment=null;
+
 fetchAll();
 
 function fetchBasedOnEndPoints(url, method) {
-    //const container = document.getElementById("books-container");
-    //const userId = container.dataset.userId;
 
     fetch(url, {
         method: method,// Specify the HTTP method
@@ -47,36 +47,51 @@ function fetchBasedOnEndPoints(url, method) {
 
             });
         })
+
         .catch(error => {
+            document.getElementById("errorMessage").innerText = error;
+
             console.error('Error loading employees:', error);
         });
 }
 
 async function fetchAverageSalary() {
+    document.getElementById('average-salary').innerHTML = "";
+
     try {
-        const response = await fetch(`/api/employees/generate/salary`,{
+        if(filteredDepartment!=null && filteredDepartment!=""){
+            url = (`/api/employees/average_salary/dept=${filteredDepartment}`)
+        }else
+         url=`/api/employees/average_salary`
+
+         const response = await fetch(url,{
             method: 'GET'});
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
         console.log(data);
-        document.getElementById('average-salary').innerHTML = `<br> Average Salary:</br>${data}`;
+        document.getElementById('average-salary').innerHTML = `Ave. Salary: ${data}`;
     } catch (error) {
         console.error('Fetch error:', error);
         document.getElementById('dataOutput').textContent = 'Failed to load data.';
     }
 }
 async function fetchAverageAge() {
+
     try {
-        const response = await fetch(`/api/employees/generate/age`,{
+        if(filteredDepartment!=null && filteredDepartment!=""){
+            url = (`/api/employees/average_age/dept=${filteredDepartment}`)
+        }else
+            url=`/api/employees/average_age`
+        const response = await fetch(url,{
             method: 'GET'});
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
         console.log(data);
-        document.getElementById('average-age').innerHTML = `<br> Average Age:</br>${data}`;
+        document.getElementById('average-age').innerHTML = `Ave. Age: ${data}`;
     } catch (error) {
         console.error('Fetch error:', error);
         document.getElementById('dataOutput').textContent = 'Failed to load data.';
@@ -102,19 +117,10 @@ function deleteItem(employeeId) {
             });
     }
 }
-const modal = document.getElementById("editEmployeeModal");
 
-modal.addEventListener("show.bs.modal", event => {
-    const btn = event.relatedTarget;
-    console.log(btn.dataset);
-    document.getElementById('edit-id').value = btn.dataset.employeeId;
-    document.getElementById('edit-name').value = btn.dataset.employeeName;
-    document.getElementById('edit-dateOfBirth').value = btn.dataset.employeeDob;
-    document.getElementById('edit-department').value = btn.dataset.employeeDepartment;
-    document.getElementById('edit-salary').value = btn.dataset.employeeSalary;
-});
 function fetchAll(page = 0) {
     currentPage = page;
+    filteredDepartment=null
     fetchBasedOnEndPoints(`/api/employees`, "GET");
 }
 let orderAge = "ASC";
@@ -135,6 +141,22 @@ function displayByDepartment(){
         orderDepartment = "ASC";
     }
 }
+document.getElementById("employees-filter").addEventListener("submit", function(event) {
+    event.preventDefault(); // prevent page reload
+    // Grab input values
+    document.getElementById('average-salary').innerHTML ="";
+    document.getElementById('average-age').innerHTML ="";
+
+    const department = document.getElementById("department").value;
+    filteredDepartment=department;
+
+    // Construct URL with query parameters
+    const params = new URLSearchParams();
+    if (department) params.append("department", department);
+
+    const url = `/api/employees/filtered?${params.toString()}`;
+    fetchBasedOnEndPoints(url, "GET");
+})
 document.getElementById("search-bar").addEventListener("submit", function(event) {
     event.preventDefault(); // prevent page reload
     const query = document.getElementById("query").value;
@@ -156,3 +178,15 @@ document.getElementById("prevBtn").addEventListener("click", () => {
     if (currentPage > 0)
         fetchAll(currentPage - 1);
 });*/
+
+const modal = document.getElementById("editEmployeeModal");
+
+modal.addEventListener("show.bs.modal", event => {
+    const btn = event.relatedTarget;
+    console.log(btn.dataset);
+    document.getElementById('edit-id').value = btn.dataset.employeeId;
+    document.getElementById('edit-name').value = btn.dataset.employeeName;
+    document.getElementById('edit-dateOfBirth').value = btn.dataset.employeeDob;
+    document.getElementById('edit-department').value = btn.dataset.employeeDepartment;
+    document.getElementById('edit-salary').value = btn.dataset.employeeSalary;
+});

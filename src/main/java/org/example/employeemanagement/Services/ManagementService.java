@@ -2,19 +2,17 @@ package org.example.employeemanagement.Services;
 
 import jakarta.transaction.Transactional;
 import org.example.employeemanagement.DTOs.EmployeeDTO;
-import org.example.employeemanagement.Entities.Admin;
 import org.example.employeemanagement.Entities.Employee;
 import org.example.employeemanagement.Repositories.EmployeesRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
-import tools.jackson.databind.exc.InvalidFormatException;
-
-import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-
+/**
+ * Service that deals with other mangement actions that won't modify the database
+ * */
 @Service
 public class ManagementService {
     EmployeesRepository employeesRepository;
@@ -22,7 +20,10 @@ public class ManagementService {
     public ManagementService(EmployeesRepository employeesRepository) {
         this.employeesRepository=employeesRepository;
     }
-
+    /**
+     * Gets all employees in the employees table
+     * @return a list of EmployeeDTO that represents all employees in the database
+     * */
     public List<EmployeeDTO> getAllEmployees(){
         List<Employee> employees = employeesRepository.findAll();
         List<EmployeeDTO> employeesDto = employees.stream()
@@ -30,31 +31,11 @@ public class ManagementService {
                 ).collect(Collectors.toList());
         return employeesDto;
     }
-    @Modifying // Tells Spring Data JPA this is an update/delete operation
-    public void updateEmployees(int id,String name, LocalDate dateOfBirth, String department, double salary) throws Exception {
-        Employee employee = employeesRepository.findByEmployeeId(id);
-        if (employee!=null){
-            employee.setName(name);
-            employee.setDateOfBirth(dateOfBirth);
-            employee.setSalary(salary);
-            employee.setDepartment(department);
-            employeesRepository.save(employee);
-        }else
-            throw new Exception("User to update does not exist");
-    }
-    @Modifying
-    @Transactional
-    public void deleteEmployee(int employeeId){
-        employeesRepository.deleteByEmployeeId(employeeId);
-    }
-
-    public EmployeeDTO findByEmployees(String id){
-        try{
-            return new EmployeeDTO(employeesRepository.findByEmployeeId(Integer.parseInt(id)));
-        }catch (InvalidFormatException e){
-            throw e;
-        }
-    }
+    /**
+     * Gets all the employees based on the user's search query
+     * @param query the query the user entered in the search bar
+     * @return a lists of EmployeeDTO that somehow match the use query
+     * */
     public List<EmployeeDTO> findBySearchQuery(String query){
         Integer id=null;
         String name =null;
@@ -72,6 +53,12 @@ public class ManagementService {
                 ).collect(Collectors.toList());
         return employeesDto;
     }
+    /**
+     * sorts all employees based on certain criteria
+     * @param sortBy what should be sorted
+     * @param sortOrder the order the list will be sorted
+     * @return a list of EmployeeDTO that are sorted based on the user's criteria
+     * */
     public List <EmployeeDTO> getAllSortedEmployees(String sortBy,String sortOrder) throws Exception {
         List <Employee> employees = employeesRepository.findAll();
 
@@ -91,21 +78,32 @@ public class ManagementService {
                 ).collect(Collectors.toList());
         return employeesDto;
     }
-    public void registerUser(int id, String name, LocalDate dateOfBirth, String department, double salary) throws Exception{
-        if (name.isEmpty() || department.isEmpty() || dateOfBirth ==null)
-            throw new Exception("Empty inputs");
-        if(employeesRepository.findByEmployeeId(id)==null){
-            Employee employee=new Employee();
-            employee.setName(name);
-            employee.setDateOfBirth(dateOfBirth);
-            employee.setDepartment(department);
-            employee.setSalary(salary);
-            employee.setEmployeeId(id);
+    /**
+     * Method that gets all employees that have the same department
+     * @param department  the department being filtered
+     * @return a list of EmployeeDTO that would be shown to the user
+     * */
+    public List<EmployeeDTO> getFilteredEmployees(String department) {
+        List<Employee> employees = new ArrayList<>();
 
-            this.employeesRepository.save(employee);
+        if ((department==null||department.isEmpty()))
+            return getAllEmployees();
+        else{
+            employees= this.employeesRepository.findByDepartment(department);
         }
-        else throw new Exception("User already exists!");
+
+        List<EmployeeDTO> employeesDto = employees.stream()
+                .map(org.example.employeemanagement.DTOs.EmployeeDTO::new
+                ).collect(Collectors.toList());
+        return employeesDto;
+
     }
 
-
+    /**
+     * Returns an employeeDTO that is being queried
+     * @param userId the userID of the employee being searched
+     * */
+    public EmployeeDTO findByEmployees(String userId) {
+        return new EmployeeDTO(employeesRepository.findByEmployeeId(Integer.parseInt(userId)));
+    }
 }

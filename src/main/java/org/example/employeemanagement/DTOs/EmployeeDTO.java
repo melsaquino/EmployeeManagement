@@ -8,7 +8,9 @@ import lombok.Setter;
 import org.example.employeemanagement.Entities.Employee;
 
 import java.time.LocalDate;
-
+/**
+ * DTO that represents an employee to the user
+ * */
 public class EmployeeDTO {
 
     @Getter(AccessLevel.PUBLIC)
