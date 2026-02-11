@@ -1,4 +1,4 @@
-package org.example.employeemanagement;
+package org.example.employeemanagement.Exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

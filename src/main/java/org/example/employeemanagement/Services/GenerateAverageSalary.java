@@ -20,7 +20,6 @@ public class GenerateAverageSalary extends GenerateService{
     @Override
     public double generate(){
         double average;
-        double total=0;
         List<Employee> employees = employeesRepository.findAll();
         average= employees.stream()
                 .mapToDouble(Employee::getSalary)
@@ -30,9 +29,9 @@ public class GenerateAverageSalary extends GenerateService{
     /**
      * Class that generates average salary of all employees in a certain department in the database
      * */
+    @Override
     public double generate(String department) {
         double average;
-        double total = 0;
         List<Employee> employees = employeesRepository.findByDepartment(department);
         average= employees.stream()
                 .mapToDouble(Employee::getSalary)

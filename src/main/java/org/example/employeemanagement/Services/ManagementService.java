@@ -4,6 +4,9 @@ import jakarta.transaction.Transactional;
 import org.example.employeemanagement.DTOs.EmployeeDTO;
 import org.example.employeemanagement.Entities.Employee;
 import org.example.employeemanagement.Repositories.EmployeesRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,11 +14,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 /**
- * Service that deals with other mangement actions that won't modify the database
+ * Service that deals with other management actions that won't modify the database
  * */
 @Service
 public class ManagementService {
-    EmployeesRepository employeesRepository;
+    private EmployeesRepository employeesRepository;
 
     public ManagementService(EmployeesRepository employeesRepository) {
         this.employeesRepository=employeesRepository;
@@ -24,9 +27,11 @@ public class ManagementService {
      * Gets all employees in the employees table
      * @return a list of EmployeeDTO that represents all employees in the database
      * */
-    public List<EmployeeDTO> getAllEmployees(){
-        List<Employee> employees = employeesRepository.findAll();
-        List<EmployeeDTO> employeesDto = employees.stream()
+    public List<EmployeeDTO> getAllEmployees(int page, int size){
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Employee> pageContent = employeesRepository.findAll(pageable);
+        List<EmployeeDTO> employeesDto = pageContent.getContent().stream()
                 .map(EmployeeDTO::new
                 ).collect(Collectors.toList());
         return employeesDto;
@@ -36,16 +41,21 @@ public class ManagementService {
      * @param query the query the user entered in the search bar
      * @return a lists of EmployeeDTO that somehow match the use query
      * */
-    public List<EmployeeDTO> findBySearchQuery(String query){
+    public List<EmployeeDTO> findBySearchQuery(String query,int page,int size){
+        Pageable pageable = PageRequest.of(page, size);
+
         Integer id=null;
         String name =null;
         List <Employee> employees;
-        if (query != null && query.matches("\\d+")) {
+        if (query ==null || query.isEmpty()){
+            return getAllEmployees(page,size);
+        }
+        else if (query.matches("\\d+")) {
             id = Integer.valueOf(query);
-            employees = employeesRepository.searchByNameOrEmployeeId(id);
+            employees = employeesRepository.searchByNameOrEmployeeId(id,pageable);
         } else {
             name = query;
-            employees = employeesRepository.searchByNameOrEmployeeId(name);
+            employees = employeesRepository.searchByNameOrEmployeeId(name,pageable);
 
         }
         List<EmployeeDTO> employeesDto = employees.stream()
@@ -83,13 +93,13 @@ public class ManagementService {
      * @param department  the department being filtered
      * @return a list of EmployeeDTO that would be shown to the user
      * */
-    public List<EmployeeDTO> getFilteredEmployees(String department) {
+    public List<EmployeeDTO> getFilteredEmployees(String department,int page, int size) {
         List<Employee> employees = new ArrayList<>();
-
+        Pageable pageable = PageRequest.of(page, size);
         if ((department==null||department.isEmpty()))
-            return getAllEmployees();
+            return getAllEmployees(page,size);
         else{
-            employees= this.employeesRepository.findByDepartment(department);
+            employees= this.employeesRepository.findByDepartment(department,pageable);
         }
 
         List<EmployeeDTO> employeesDto = employees.stream()

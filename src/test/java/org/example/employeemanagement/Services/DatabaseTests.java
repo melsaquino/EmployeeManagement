@@ -20,12 +20,11 @@ public class DatabaseTests {
      * */
     @Test
     public void testEverythingIsOkay() throws Exception{
-        if(modifyDBServices.findByEmployeeId(107)!=null)
-           modifyDBServices.deleteEmployee(107);
+        if(modifyDBServices.findByEmployeeId(1007)!=null)
+           modifyDBServices.deleteEmployee(1007);
 
-        modifyDBServices.registerUser(107,"Maria Santos", LocalDate.parse("1991-02-09"),"Accounting",30000);
-        // EmployeeDTO employee = modifyDBServices.findByEmployees("107");
-        Employee employee =employeesRepository.findByEmployeeId(107);
+        modifyDBServices.registerUser(1007,"Maria Santos", LocalDate.parse("1991-02-09"),"Accounting",30000);
+        Employee employee =employeesRepository.findByEmployeeId(1007);
         assertNotNull(employee);
         assertEquals("Maria Santos", employee.getName());
         assertEquals(LocalDate.parse("1991-02-09"), employee.getDateOfBirth());
@@ -33,8 +32,8 @@ public class DatabaseTests {
         assertEquals(30000,employee.getSalary());
 
         //TEST UPDATE
-        modifyDBServices.updateEmployees(107,"Maria Santo", LocalDate.parse("1991-01-09"),"Accounting",34000);
-        employee = employeesRepository.findByEmployeeId(107);
+        modifyDBServices.updateEmployees(1007,"Maria Santo", LocalDate.parse("1991-01-09"),"Accounting",34000);
+        employee = employeesRepository.findByEmployeeId(1007);
         assertNotNull(employee);
 
         assertEquals("Maria Santo", employee.getName());
@@ -43,8 +42,8 @@ public class DatabaseTests {
         assertEquals(34000, employee.getSalary());
 
         //TEST DELETE
-        modifyDBServices.deleteEmployee(107);
-        employee = employeesRepository.findByEmployeeId(107);
+        modifyDBServices.deleteEmployee(1007);
+        employee = employeesRepository.findByEmployeeId(1007);
         assertNull(employee);
 
     }

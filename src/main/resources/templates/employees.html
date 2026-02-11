@@ -20,9 +20,10 @@
         <div th:if="${errorMessage}" class="alert alert-danger">
             <p th:text="${errorMessage}">Display the error message here.</p>
         </div>
-        <h1>Employees</h1>
+        <h3>Employees</h3>
         <div class="container">
-            <div style="padding:10px">
+            <div class="row mb-2">
+                <div class="col-6">
                 <form class="d-flex" method="get" action="" id="search-bar">
                     <input class="form-control me-2" type="search" id="query" name="query"
                            placeholder="Search by name or ID…">
@@ -30,23 +31,27 @@
                         Search
                     </button>
                 </form>
-                <form method="get" id="employees-filter" class="row g-2 mb-3">
+                </div>
+                <div class="col-6">
+                <form method="get" id="employees-filter" class="d-flex">
                     <input type="hidden" name="q" th:value="${param.q}">
-
-                    <div class="col-md-3">
-                        <input type="text" class="form-control" name="department" id="department" placeholder="Filter Department?"/>
-                    </div>
-
-                    <div class="col-md-3">
-                        <button class="btn btn-primary w-100">Apply</button>
-                    </div>
+                    <select class="w-50 me-2" name="department" id="department">
+                        <option value="">See All</option>
+                        <option value="Accounting">Accounting</option>
+                        <option value="IT">IT</option>
+                        <option value="HR">HR</option>
+\                    </select>
+                    <button class="btn btn-outline-primary w-25">Filter</button>
                 </form>
+                </div>
             </div>
 
             <div class="row align-items-center mb-2">
+                <div class="container">
                 <button type="button" class="btn btn-success mb-1" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
-                    Add Employee
+                    Create a New Employee
                 </button>
+                </div>
                 <div class="col-auto">
                     <button class="btn btn-warning me-2 " onClick="fetchAverageAge()">
                         Generate Average Age
@@ -66,13 +71,19 @@
                 </div>
             </div>
             <table class="table table-striped">
+                <tr style="align-items: center">
+                    <td colspan="7">
+                        <button id="prevBtn" ><</button>
+                        <button id="nextBtn" >></button>
+                    </td>
+                </tr>
             <tr>
-                <th>Id</th>
+                <th>ID</th>
                 <th>Name</th>
                 <th class="clickable" onClick="displayByAge()" >Date of Birth</th>
                 <th class="clickable" onClick="displayByDepartment()">Department</th>
                 <th>Salary</th>
-                <th colspan="2" >Actions</th>
+                <th colspan="3" >Actions</th>
 
             </tr>
             <tbody id="employees-list"></tbody>
@@ -85,12 +96,9 @@
                     <h5 class="modal-title" id="addUserModalLabel">Add Employee</h5>
                 </div>
                 <div class="modal-body">
-                    <div th:insert="addUserFragment.html::createEmployee"></div>
+                    <div th:insert="~{addUserFragment.html::createEmployee}"></div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary registerbtn">Register</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div></form> <!-- opening <form>tag in the fragment -->
+
             </div>
         </div>
     </div>
@@ -98,10 +106,10 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="editUserModalLabel">Add Employee</h5>
+                    <h5 class="modal-title" id="editUserModalLabel">Employee Employee</h5>
                 </div>
                 <div class="modal-body">
-                    <div th:insert="editUserFragment.html::editEmployee"></div>
+                    <div th:insert="~{editUserFragment.html::editEmployee}"></div>
                 </div>
 
             </div>

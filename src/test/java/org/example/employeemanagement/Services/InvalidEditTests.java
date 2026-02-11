@@ -29,15 +29,15 @@ public class InvalidEditTests {
      * */
     @Test
     public void testInvalidBdayEdit(){
-        Employee beforeEmployee = employeesRepository.findByEmployeeId(104);
+        Employee beforeEmployee = employeesRepository.findByEmployeeId(101);
 
         Exception exception = assertThrows(InvalidBirthDateException.class, () -> {
-            modifyDBServices.updateEmployees(104,"Maria Santo", LocalDate.parse("1100-01-09"),"Accounting",34000);
+            modifyDBServices.updateEmployees(101,"Maria Santo", LocalDate.parse("1100-01-09"),"Accounting",34000);
 
         });
         assertEquals("Invalid date of birth", exception.getMessage());
 
-        Employee editedEmployee = employeesRepository.findByEmployeeId(104);
+        Employee editedEmployee = employeesRepository.findByEmployeeId(101);
         assertEquals(beforeEmployee.getName(),editedEmployee.getName());
         assertEquals(beforeEmployee.getDateOfBirth(),editedEmployee.getDateOfBirth());
         assertEquals(beforeEmployee.getDepartment(),editedEmployee.getDepartment());
@@ -50,13 +50,13 @@ public class InvalidEditTests {
      * */
     @Test
     public void testInvalidSalaryEdit(){
-        Employee beforeEmployee = employeesRepository.findByEmployeeId(104);
+        Employee beforeEmployee = employeesRepository.findByEmployeeId(101);
 
         Exception exception = assertThrows(InvalidSalaryException.class, () -> {
-            modifyDBServices.updateEmployees(104,"Maria Santo", LocalDate.parse("1990-01-09"),"Accounting",-34000);
+            modifyDBServices.updateEmployees(101,"Maria Santo", LocalDate.parse("1990-01-09"),"Accounting",-34000);
         });
         assertEquals("Invalid Salary", exception.getMessage());
-        Employee editedEmployee = employeesRepository.findByEmployeeId(104);
+        Employee editedEmployee = employeesRepository.findByEmployeeId(101);
         assertEquals(beforeEmployee.getName(),editedEmployee.getName());
         assertEquals(beforeEmployee.getDateOfBirth(),editedEmployee.getDateOfBirth());
         assertEquals(beforeEmployee.getDepartment(),editedEmployee.getDepartment());
@@ -72,11 +72,20 @@ public class InvalidEditTests {
     public void testUserDoesNotExistEdit(){
 
         Exception exception = assertThrows(EmployeeDoesNotExistException.class, () -> {
-            // Code that is expected to throw an IllegalArgumentException
             modifyDBServices.updateEmployees(200,"Maria Santo", LocalDate.parse("1990-01-09"),"Accounting",34000);
 
         });
         assertEquals("User with ID 200 does not exist", exception.getMessage());
+
+    }
+    @Test
+    public void testUserBlanksEdit(){
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            modifyDBServices.updateEmployees(101,"",null,"",34000);
+
+        });
+        assertEquals("Empty inputs", exception.getMessage());
 
     }
 }

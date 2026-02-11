@@ -29,10 +29,9 @@ public class InvalidCreateUserTests {
      * */
     @Test
     public void testInvalidBdayAdd(){
-        Employee beforeEmployee = employeesRepository.findByEmployeeId(104);
 
         Exception exception = assertThrows(InvalidBirthDateException.class, () -> {
-            modifyDBServices.registerUser(108,"Maria Santo", LocalDate.parse("1100-01-09"),"Accounting",34000);
+            modifyDBServices.registerUser(400,"Maria Santo", LocalDate.parse("1100-01-09"),"Accounting",34000);
 
         });
         assertEquals("Invalid date of birth", exception.getMessage());
@@ -45,7 +44,7 @@ public class InvalidCreateUserTests {
     public void testInvalidSalaryAdd(){
 
         Exception exception = assertThrows(InvalidSalaryException.class, () -> {
-            modifyDBServices.registerUser(109,"Maria Cruz", LocalDate.parse("1990-01-09"),"Accounting",-34000);
+            modifyDBServices.registerUser(300,"Maria Cruz", LocalDate.parse("1990-01-09"),"Accounting",-34000);
         });
         assertEquals("Invalid Salary", exception.getMessage());
 
@@ -55,15 +54,25 @@ public class InvalidCreateUserTests {
      * Method tests that when an employee with an existing ID is added the correct exception is thrown with the correct message
      * */
     @Test
-    public void testEmployeeExistEdit(){
+    public void testEmployeeExistAdd(){
         Employee beforeEmployee = employeesRepository.findByEmployeeId(104);
 
         Exception exception = assertThrows(UserExistsException.class, () -> {
-            // Code that is expected to throw an IllegalArgumentException
             modifyDBServices.registerUser(100,"Maria Santo", LocalDate.parse("1990-01-09"),"Accounting",34000);
 
         });
         assertEquals("User with ID 100 already exists!", exception.getMessage());
+
+    }
+
+    @Test
+    public void testCreateEmployeeBlanks(){
+
+        Exception exception = assertThrows(Exception.class, () -> {
+            modifyDBServices.registerUser(999,"Maria Santo",null,"Accounting",34000);
+
+        });
+        assertEquals("Empty inputs", exception.getMessage());
 
     }
 }

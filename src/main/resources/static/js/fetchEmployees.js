@@ -1,6 +1,7 @@
 const csrfToken = document.querySelector('meta[name="_csrf"]').content;
 let filteredDepartment=null;
-
+let currentPage=0;
+let searchedQuery =null;
 fetchAll();
 
 function fetchBasedOnEndPoints(url, method) {
@@ -71,7 +72,7 @@ async function fetchAverageSalary() {
         }
         const data = await response.json();
         console.log(data);
-        document.getElementById('average-salary').innerHTML = `Ave. Salary: ${data}`;
+        document.getElementById('average-salary').innerHTML = `<b>Ave. Salary:</b> ${data}`;
     } catch (error) {
         console.error('Fetch error:', error);
         document.getElementById('dataOutput').textContent = 'Failed to load data.';
@@ -91,7 +92,7 @@ async function fetchAverageAge() {
         }
         const data = await response.json();
         console.log(data);
-        document.getElementById('average-age').innerHTML = `Ave. Age: ${data}`;
+        document.getElementById('average-age').innerHTML = `<b>Ave. Age:</b> ${data}`;
     } catch (error) {
         console.error('Fetch error:', error);
         document.getElementById('dataOutput').textContent = 'Failed to load data.';
@@ -106,7 +107,7 @@ function deleteItem(employeeId) {
                 if (response.ok) {
                     console.log(`User ${employeeId} deleted successfully.`);
                     //Optionally, redirect or refresh the page
-                    //window.location.reload();
+                    window.location.reload();
                 } else {
                     // Handle errors (e.g., item not found, server error)
                     console.error('Failed to delete the employee.');
@@ -121,7 +122,8 @@ function deleteItem(employeeId) {
 function fetchAll(page = 0) {
     currentPage = page;
     filteredDepartment=null
-    fetchBasedOnEndPoints(`/api/employees`, "GET");
+    searchedQuery =null;
+    fetchBasedOnEndPoints(`/api/employees?page=${page}`, "GET");
 }
 let orderAge = "ASC";
 let orderDepartment ="ASC"
@@ -143,7 +145,9 @@ function displayByDepartment(){
 }
 document.getElementById("employees-filter").addEventListener("submit", function(event) {
     event.preventDefault(); // prevent page reload
+    searchedQuery=null
     // Grab input values
+    currentPage =0;
     document.getElementById('average-salary').innerHTML ="";
     document.getElementById('average-age').innerHTML ="";
 
@@ -154,30 +158,54 @@ document.getElementById("employees-filter").addEventListener("submit", function(
     const params = new URLSearchParams();
     if (department) params.append("department", department);
 
-    const url = `/api/employees/filtered?${params.toString()}`;
+    const url = `/api/employees/filtered?${params.toString()}&page=${currentPage}`;
     fetchBasedOnEndPoints(url, "GET");
 })
 document.getElementById("search-bar").addEventListener("submit", function(event) {
     event.preventDefault(); // prevent page reload
     const query = document.getElementById("query").value;
-
+    currentPage =0;
+    filteredDepartment=null;
+    searchedQuery=query;
     // Construct URL with query parameters
     const params = new URLSearchParams();
     if (query) params.append("query", query);
 
-    const url = `/api/employees/search?${params.toString()}`;
+    const url = `/api/employees/search?${params.toString()}&page=${currentPage}`;
     fetchBasedOnEndPoints(url, "GET");
 
 });
 
-/*
 document.getElementById("nextBtn").addEventListener("click", () => {
-    fetchAll(currentPage + 1);
+currentPage+=1;
+if ((filteredDepartment == null || filteredDepartment =="") &&(searchedQuery==null || searchedQuery=="") )
+    fetchAll(currentPage);
+    else if(filteredDepartment != null && filteredDepartment !=""){
+        const url = `/api/employees/filtered?department=${filteredDepartment}&page=${currentPage}`;
+        fetchBasedOnEndPoints(url, "GET");
+
+    }else if(searchedQuery!=null && searchedQuery !=""){
+        const url = `/api/employees/search?query=${searchedQuery}&page=${currentPage}`;
+        fetchBasedOnEndPoints(url, "GET");
+
+    }
 });
 document.getElementById("prevBtn").addEventListener("click", () => {
-    if (currentPage > 0)
-        fetchAll(currentPage - 1);
-});*/
+    if (currentPage > 0){
+        currentPage-=1
+    }
+    if ((filteredDepartment == null || filteredDepartment =="") &&(searchedQuery==null || searchedQuery=="")){
+         fetchAll(currentPage);
+    }
+    else if(filteredDepartment != null && filteredDepartment !=""){
+         const url = `/api/employees/filtered?department=${filteredDepartment}&page=${currentPage}`;
+         fetchBasedOnEndPoints(url, "GET");
+    }else if(searchedQuery!=null && searchedQuery !=""){
+         const url = `/api/employees/search?query=${searchedQuery}&page=${currentPage}`;
+         fetchBasedOnEndPoints(url, "GET");
+    }
+
+});
 
 const modal = document.getElementById("editEmployeeModal");
 

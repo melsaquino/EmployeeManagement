@@ -28,6 +28,7 @@ public class GenerateAverageAge extends GenerateService {
     /**
      * Class that generates average age of all employees in a certain department in the database
      * */
+    @Override
     public double generate(String department){
         double average;
         List<Employee> employees = employeesRepository.findByDepartment(department);
