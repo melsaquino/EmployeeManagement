@@ -74,14 +74,17 @@ public class ModifyDBServices {
                     }
 
                 }
-                else throw new InvalidSalaryException("Invalid Salary");
+                else throw new InvalidSalaryException(bundle.getString("invalid.salary.negative"));
             }
             else{
                 String message = bundle.getString("invalid.bday");
                 throw new InvalidBirthDateException(message);
             }
         }
-        else throw new UserExistsException("User with ID "+id+" already exists!");
+
+        else{
+            throw new UserExistsException(bundle.getString("invalid.user.exist.id"),id);
+        }
     }
     /**
      * Method used to edit the details of an employee
@@ -94,7 +97,7 @@ public class ModifyDBServices {
     @Modifying
     public void updateEmployees(int id, String name, LocalDate dateOfBirth, String department, double salary) throws Exception {
         if (name.isEmpty() || department.isEmpty() || dateOfBirth ==null)
-            throw new Exception("Empty inputs");
+            throw new Exception(bundle.getString("invalid.emptyInput"));
         Employee employee = employeesRepository.findByEmployeeId(id);
         if (employee != null){
             if(isValidBirthday(dateOfBirth)){
@@ -129,8 +132,7 @@ public class ModifyDBServices {
                         }
                     }
                 }else {
-                    String message = bundle.getString("invalid.salary");
-
+                    String message = bundle.getString("invalid.salary.negative");
                     throw new InvalidSalaryException(message);
                 }
             }
@@ -141,7 +143,7 @@ public class ModifyDBServices {
             }
 
         }else
-            throw new EmployeeDoesNotExistException("User with ID "+id+ " does not exist");
+            throw new EmployeeDoesNotExistException(bundle.getString("invalid.employee.notExist"),id);
     }
     /**
      * Method used to delete an employee from the database
@@ -152,7 +154,7 @@ public class ModifyDBServices {
     public void deleteEmployee(int employeeId){
         if(findByEmployeeId(employeeId)!=null)
             employeesRepository.deleteByEmployeeId(employeeId);
-        else throw new EmployeeDoesNotExistException("User with ID "+employeeId+ " does not exist");
+        else throw new EmployeeDoesNotExistException(bundle.getString("invalid.employee.notExist"),employeeId);
 
     }
     /**

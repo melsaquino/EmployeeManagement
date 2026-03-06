@@ -9,12 +9,14 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ResourceBundle;
 
 /**
  * Service class deals with the functionalities of registering a new user
  * */
 @Service
 public class RegistrationService {
+    private final ResourceBundle bundle = ResourceBundle.getBundle("messages-en");
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
     private final AdminsRepository adminsRepository;
@@ -43,7 +45,7 @@ public class RegistrationService {
 
             this.adminsRepository.save(employee);
         }
-        else throw new Exception("User already exists!");
+        else throw new Exception(bundle.getString("invalid.userExist"));
     }
 
 

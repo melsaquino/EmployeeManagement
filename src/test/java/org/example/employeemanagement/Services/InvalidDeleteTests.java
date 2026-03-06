@@ -26,7 +26,7 @@ public class InvalidDeleteTests {
         Exception exception = assertThrows(EmployeeDoesNotExistException.class, () -> {
             modifyDBServices.deleteEmployee(999);
         });
-        assertEquals("User with ID 999 does not exist", exception.getMessage());
+        assertEquals("Employee with ID 999 does not exist", exception.getMessage().toString());
         assertEquals(sizeBefore,employeesRepository.findAll().size());
     }
 

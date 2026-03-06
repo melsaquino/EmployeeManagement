@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -24,6 +25,8 @@ public class InvalidEditTests {
     @Autowired
     ModifyDBServices modifyDBServices;
 
+    private final ResourceBundle bundle = ResourceBundle.getBundle("messages-en");
+
     /**
      * Tests that the correct exception is thrown when an invalid birthday is entered when editing a user
      * */
@@ -35,7 +38,7 @@ public class InvalidEditTests {
             modifyDBServices.updateEmployees(101,"Maria Santo", LocalDate.parse("1100-01-09"),"Accounting",34000);
 
         });
-        assertEquals("Invalid date of birth", exception.getMessage());
+        assertEquals(bundle.getString("invalid.bday"), exception.getMessage());
 
         Employee editedEmployee = employeesRepository.findByEmployeeId(101);
         assertEquals(beforeEmployee.getName(),editedEmployee.getName());
@@ -55,7 +58,7 @@ public class InvalidEditTests {
         Exception exception = assertThrows(InvalidSalaryException.class, () -> {
             modifyDBServices.updateEmployees(101,"Maria Santo", LocalDate.parse("1990-01-09"),"Accounting",-34000);
         });
-        assertEquals("Invalid Salary", exception.getMessage());
+        assertEquals(bundle.getString("invalid.salary.negative"), exception.getMessage());
         Employee editedEmployee = employeesRepository.findByEmployeeId(101);
         assertEquals(beforeEmployee.getName(),editedEmployee.getName());
         assertEquals(beforeEmployee.getDateOfBirth(),editedEmployee.getDateOfBirth());
@@ -75,7 +78,7 @@ public class InvalidEditTests {
             modifyDBServices.updateEmployees(200,"Maria Santo", LocalDate.parse("1990-01-09"),"Accounting",34000);
 
         });
-        assertEquals("User with ID 200 does not exist", exception.getMessage());
+        assertEquals("Employee with ID 200 does not exist", exception.getMessage());
 
     }
     @Test
@@ -85,7 +88,7 @@ public class InvalidEditTests {
             modifyDBServices.updateEmployees(101,"",null,"",34000);
 
         });
-        assertEquals("Empty inputs", exception.getMessage());
+        assertEquals(bundle.getString("invalid.emptyInput"), exception.getMessage());
 
     }
 }

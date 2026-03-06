@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
+import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -23,6 +24,7 @@ public class InvalidCreateUserTests {
     EmployeesRepository employeesRepository;
     @Autowired
     ModifyDBServices modifyDBServices;
+    private final ResourceBundle bundle = ResourceBundle.getBundle("messages-en");
 
     /**
      * Method tests invalid birthday input in adding an employees and checks that the correct exception and exception message is thrown
@@ -34,7 +36,7 @@ public class InvalidCreateUserTests {
             modifyDBServices.registerUser(400,"Maria Santo", LocalDate.parse("1100-01-09"),"Accounting",34000);
 
         });
-        assertEquals("Invalid date of birth", exception.getMessage());
+        assertEquals(bundle.getString("invalid.bday"), exception.getMessage());
 
     }
     /**
@@ -46,7 +48,7 @@ public class InvalidCreateUserTests {
         Exception exception = assertThrows(InvalidSalaryException.class, () -> {
             modifyDBServices.registerUser(300,"Maria Cruz", LocalDate.parse("1990-01-09"),"Accounting",-34000);
         });
-        assertEquals("Invalid Salary", exception.getMessage());
+        assertEquals(bundle.getString("invalid.salary.negative"), exception.getMessage());
 
 
     }
@@ -72,7 +74,7 @@ public class InvalidCreateUserTests {
             modifyDBServices.registerUser(999,"Maria Santo",null,"Accounting",34000);
 
         });
-        assertEquals("Empty inputs", exception.getMessage());
+        assertEquals(bundle.getString("invalid.emptyInput"), exception.getMessage());
 
     }
 }
