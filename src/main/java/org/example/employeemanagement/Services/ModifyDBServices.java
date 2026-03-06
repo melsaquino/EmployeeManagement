@@ -47,11 +47,11 @@ public class ModifyDBServices {
      * @param department the department of the new employee
      * @param salary the salary of the new employee
      * */
-    public void registerUser(int id, String name, LocalDate dateOfBirth, String department, double salary) throws Exception{
+    public Employee registerUser(int id, String name, LocalDate dateOfBirth, String department, double salary) throws Exception{
+        department= department.toUpperCase();
         if (name.isEmpty() || department.isEmpty() || dateOfBirth ==null){
             String message = bundle.getString("invalid.emptyInput");
             throw new Exception(message);
-
         }
         if(employeesRepository.findByEmployeeId(id)==null){
             if(isValidBirthday(dateOfBirth)){
@@ -62,11 +62,17 @@ public class ModifyDBServices {
                     employee.setSalary(salary);
                     employee.setEmployeeId(id);
                     if (department.equalsIgnoreCase("IT")){
+                        employee.setDepartment(department);
                         this.itRepository.save(new IT(employee));
+                        return employee;
                     }else if (department.equalsIgnoreCase("HR")){
+                        employee.setDepartment(department);
                         this.hrRepository.save(new HR(employee));
+                        return employee;
                     }else if (department.equalsIgnoreCase("accounting")){
+                        employee.setDepartment(department);
                         this.accountingRepository.save(new Accounting(employee));
+                        return employee;
                     }
                     else{
                         String message = bundle.getString("invalid.department");
@@ -81,7 +87,6 @@ public class ModifyDBServices {
                 throw new InvalidBirthDateException(message);
             }
         }
-
         else{
             throw new UserExistsException(bundle.getString("invalid.user.exist.id"),id);
         }
@@ -95,7 +100,8 @@ public class ModifyDBServices {
      * @param salary the new salary of the employee being edited
      * */
     @Modifying
-    public void updateEmployees(int id, String name, LocalDate dateOfBirth, String department, double salary) throws Exception {
+    public Employee updateEmployees(int id, String name, LocalDate dateOfBirth, String department, double salary) throws Exception {
+        department= department.toUpperCase();
         if (name.isEmpty() || department.isEmpty() || dateOfBirth ==null)
             throw new Exception(bundle.getString("invalid.emptyInput"));
         Employee employee = employeesRepository.findByEmployeeId(id);
@@ -113,23 +119,34 @@ public class ModifyDBServices {
                         }else if (department.equalsIgnoreCase("accounting")){
                             this.accountingRepository.save((Accounting)employee);
                         }
+                        return employee;
                     }else {
-                        if(employee instanceof IT)
-                            this.itRepository.delete((IT)employee);
-                        if(employee instanceof HR)
+                        if(employee instanceof IT) {
+                            this.itRepository.delete((IT) employee);
+                        }
+                        if(employee instanceof HR){
                             this.hrRepository.delete((HR)employee);
-                        if(employee instanceof Accounting)
-                            this.accountingRepository.delete((Accounting)employee);
+                        }
+                        if(employee instanceof Accounting) {
+                            this.accountingRepository.delete((Accounting) employee);
+                        }
                         if (department.equalsIgnoreCase("IT")) {
+                            employee.setDepartment(department);
                             this.itRepository.save(new IT(employee));
+                            return employee;
                         } else if (department.equalsIgnoreCase("HR")) {
+                            employee.setDepartment(department);
                             this.hrRepository.save(new HR(employee));
-                        } else if (department.equalsIgnoreCase("accounting")) {
+                            return employee;
+                        } else if (department.equalsIgnoreCase("ACCOUNTING")) {
+                            employee.setDepartment(department);
                             this.accountingRepository.save(new Accounting(employee));
+                            return employee;
                         } else{
                             String message = bundle.getString("invalid.department");
                             throw new InvalidDepartmentException(message);
                         }
+
                     }
                 }else {
                     String message = bundle.getString("invalid.salary.negative");
@@ -151,9 +168,13 @@ public class ModifyDBServices {
      * */
     @Modifying
     @Transactional
-    public void deleteEmployee(int employeeId){
-        if(findByEmployeeId(employeeId)!=null)
+    public Employee deleteEmployee(int employeeId){
+        Employee employee=findByEmployeeId(employeeId);
+        if(employee!=null) {
+
             employeesRepository.deleteByEmployeeId(employeeId);
+            return employee;
+        }
         else throw new EmployeeDoesNotExistException(bundle.getString("invalid.employee.notExist"),employeeId);
 
     }
