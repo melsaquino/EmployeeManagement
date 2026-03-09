@@ -3,7 +3,10 @@ let filteredDepartment=null;
 let currentPage=0;
 let searchedQuery =null;
 fetchAll();
-
+const phpFormatter = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'PHP',
+                });
 function fetchBasedOnEndPoints(url, method) {
 
     fetch(url, {
@@ -20,16 +23,21 @@ function fetchBasedOnEndPoints(url, method) {
                 csrfInput.type = "hidden";
                 csrfInput.name = "_csrf";
                 csrfInput.value = csrfToken;
+
+
+                // 2. Apply to the object attribute
+                const salaryCurrency = phpFormatter.format(employee.salary);
+
                 row.innerHTML = `
                     <td>${employee.employeeId}</td>
                     <td>${employee.name}</td>
                     <td>${employee.dateOfBirth}</td>
                     <td>${employee.department}</td>
-                    <td>${employee.salary}</td>
+                    <td>${salaryCurrency}</td>
                     <td><button type="button" 
                     class="btn btn-outline-success" 
                         data-bs-toggle="modal" 
-                        data-employee-id="${employee.employeeId}"
+                        data-employee-id="${salaryCurrency}"
                         data-employee-name ="${employee.name}"
                         data-employee-dob ="${employee.dateOfBirth}"
                         data-employee-department="${employee.department}"
@@ -72,7 +80,9 @@ async function fetchAverageSalary() {
         }
         const data = await response.json();
         console.log(data);
-        document.getElementById('average-salary').innerHTML = `<b>Ave. Salary:</b> ${data}`;
+        const salaryCurrency = phpFormatter.format(data);
+
+        document.getElementById('average-salary').innerHTML = `<b>Ave. Salary:</b> ${salaryCurrency}`;
     } catch (error) {
         console.error('Fetch error:', error);
         document.getElementById('dataOutput').textContent = 'Failed to load data.';
